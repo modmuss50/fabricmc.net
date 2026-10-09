@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 
-import { exit } from "node:process";
-import { Command } from "@cliffy/command";
-import { CompletionsCommand } from "@cliffy/command/completions";
+import { Command } from "commander";
 import { initCommand } from "./commands/init.ts";
 import { versionsCommand } from "./commands/versions.ts";
 
@@ -15,14 +13,10 @@ const cmd = new Command()
   .version(VERSION)
   .description("A set of command line tools to aid Fabric mod development")
   .action(() => {
-    // Show the help in the default command with no args.
-    cmd.showHelp();
-    exit(0);
-  })
-  .command("init", initCommand());
+    cmd.outputHelp();
+  });
 
-cmd
-  .command("versions", versionsCommand())
-  .command("completions", new CompletionsCommand());
+cmd.addCommand(initCommand());
+cmd.addCommand(versionsCommand());
 
-await cmd.parse();
+await cmd.parseAsync();

@@ -1,5 +1,5 @@
 import * as generator from "@fabricmc/scripts";
-import { Command } from "@cliffy/command";
+import { Command } from "commander";
 
 const LOOM_VERSION = "1.18-SNAPSHOT";
 
@@ -36,16 +36,18 @@ export function versionsCommand() {
     .name("versions")
     .description("Show the recommended Fabric versions for a Minecraft version")
     .option("--json", "Print the recommended versions as JSON")
-    .arguments("[minecraftVersion:string]")
-    .action(async (options, minecraftVersion: string | undefined) => {
-      const versions = await resolveVersions(minecraftVersion);
+    .argument("[minecraftVersion]", "The Minecraft version")
+    .action(
+      async (minecraftVersion: string | undefined, options: { json?: boolean }) => {
+        const versions = await resolveVersions(minecraftVersion);
 
-      console.log(
-        options.json
-          ? formatVersionsJson(versions)
-          : formatVersionsText(versions),
-      );
-    });
+        console.log(
+          options.json
+            ? formatVersionsJson(versions)
+            : formatVersionsText(versions),
+        );
+      },
+    );
 }
 
 export async function resolveVersions(

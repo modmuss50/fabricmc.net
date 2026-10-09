@@ -1,16 +1,11 @@
 import * as generator from "@fabricmc/scripts";
-import { Command } from "@cliffy/command";
-import {
-  Checkbox,
-  type CheckboxOption,
-  Input,
-  Select,
-} from "@cliffy/prompt";
+import { Command, Option } from "commander";
+import prompts from "prompts";
 import { XMLParser } from "fast-xml-parser";
 import * as path from "node:path";
 import { mkdir, writeFile as write } from "node:fs/promises";
 import { cwd, env, exit } from "node:process";
-import { colors } from "@cliffy/ansi/colors";
+import chalk from "chalk";
 import * as utils from "../utils.ts";
 import fontData from "../font.ts";
 import { Buffer } from "node:buffer";
@@ -18,9 +13,9 @@ import { PNG } from "pngjs";
 import * as pureimage from "pureimage";
 import * as opentype from "opentype.js";
 
-const error = colors.bold.red;
-const progress = colors.bold.yellow;
-const success = colors.bold.green;
+const error = chalk.bold.red;
+const progress = chalk.bold.yellow;
+const success = chalk.bold.green;
 
 const MOJMAP_ADVANCED_OPTION = "Mojang Mappings";
 const ICON_ADVANCED_OPTION = "Generate Unique Mod Icon";
@@ -38,47 +33,50 @@ const ADVANCED_OPTIONS: Map<string, string> = new Map([
 ]);
 
 interface CliOptions {
-  defaultOptions?: true;
+  defaultOptions?: boolean;
   name?: string;
   modid?: string;
   packageName?: string;
   version?: string;
-  option?: (string | true)[];
+  option?: string[];
 }
-
-const optionArg = {
-  conflicts: ["defaultOptions"],
-};
 
 export function initCommand() {
   return new Command()
     .name("init")
     .description("Generate a new fabric project")
     .option("-y, --defaultOptions", "Generate a mod with default options")
-    .option("-n, --name <name:string>", "The name of the mod", optionArg)
-    .option("-m, --modid <modid:string>", "The modid of the mod", optionArg)
-    .option(
-      "-p, --packageName <packageName:string>",
-      "The package name of the mod",
-      optionArg,
+    .addOption(
+      new Option("-n, --name <name>", "The name of the mod")
+        .conflicts("defaultOptions"),
     )
-    .option(
-      "-v, --version <version:string>",
-      "The minecraft version",
-      optionArg,
+    .addOption(
+      new Option("-m, --modid <modid>", "The modid of the mod")
+        .conflicts("defaultOptions"),
     )
-    .option(
-      "-o, --option [advancedOption:string]",
-      "Specify an advanced option, one of" +
-        Object.keys(ADVANCED_OPTIONS).join(","),
-      {
-        ...optionArg,
-        collect: true,
-        hidden: true,
-      },
+    .addOption(
+      new Option("-p, --packageName <packageName>", "The package name of the mod")
+        .conflicts("defaultOptions"),
     )
-    .arguments("[dir:file]")
-    .action(async (options, dir: string | undefined) => {
+    .addOption(
+      new Option("-v, --version <version>", "The minecraft version")
+        .conflicts("defaultOptions"),
+    )
+    .addOption(
+      new Option(
+        "-o, --option <advancedOption>",
+        "Specify an advanced option, one of: " +
+          Array.from(ADVANCED_OPTIONS.keys()).join(", "),
+      )
+        .conflicts("defaultOptions")
+        .argParser((value: string, previous: string[] = []) => [
+          ...previous,
+          value,
+        ])
+        .hideHelp(),
+    )
+    .argument("[dir]", "The output directory")
+    .action(async (dir: string | undefined, options: CliOptions) => {
       await generate(options, dir);
     });
 }
@@ -193,18 +191,23 @@ async function promptUser(
 
   validateCliOptions(cli);
 
-  const modName: string = cli.name ?? await Input.prompt({
+  const modName = cli.name ?? await prompt<string>({
+    type: "text",
     message: "Choose a name",
-    default: startingName,
-    minLength: 2,
+    initial: startingName,
+    validate: (value: string) =>
+      value.length >= 2 || "The name must have at least 2 characters",
   });
 
-  const modId: string = cli.modid ?? await Input.prompt({
+  const modId = cli.modid ?? await prompt<string>({
+    type: "text",
     message: "Choose a unique modid",
-    default: generator.nameToModId(modName),
-    minLength: 2,
-    maxLength: 64,
-    validate: (value) => {
+    initial: generator.nameToModId(modName),
+    validate: (value: string) => {
+      if (value.length < 2 || value.length > 64) {
+        return "The modid must have between 2 and 64 characters";
+      }
+
       const errors = generator.computeCustomModIdErrors(value);
       if (errors == undefined) {
         return true;
@@ -214,16 +217,16 @@ async function promptUser(
     },
   });
 
-  const packageName: string = cli.packageName ?? await Input.prompt({
+  const packageName = cli.packageName ?? await prompt<string>({
+    type: "text",
     message: "Choose a package name",
-    default: generator.generatePackageName(
+    initial: generator.generatePackageName(
       (env.FABRIC_MOD_GENERATOR_GLOBAL_PACKAGE_PREFIX ?? "") + modId,
     ),
-    transform: (value) => {
-      return generator.formatPackageName(value);
-    },
-    validate: (value) => {
-      const errors = generator.computePackageNameErrors(value);
+    format: (value: string) => generator.formatPackageName(value),
+    validate: (value: string) => {
+      const formatted = generator.formatPackageName(value);
+      const errors = generator.computePackageNameErrors(formatted);
 
       if (errors.length == 0) {
         return true;
@@ -243,22 +246,19 @@ async function promptUser(
       fatalError(`The minecraft version ${minecraftVersion} does not exist.`);
     }
   } else {
-    minecraftVersion = await Select.prompt({
+    minecraftVersion = await prompt<string>({
+      type: "select",
       message: "Select the minecraft version",
-      options: minecraftVersions.map((v) => v.version),
-      default: minecraftVersions.find((v) => v.stable)?.version,
+      choices: minecraftVersions.map((v) => ({
+        title: v.version,
+        value: v.version,
+      })),
+      initial: Math.max(0, minecraftVersions.findIndex((v) => v.stable)),
     });
   }
 
   const cliOptions = cli.option?.map((o): string => {
-    if (o === true) {
-      fatalError("Advanced options must be specified with a value");
-      return "unreachable";
-    }
-
-    const option = o as string;
-
-    if (!ADVANCED_OPTIONS.has(option)) {
+    if (!ADVANCED_OPTIONS.has(o)) {
       fatalError(
         `Unknown option ${o} must be one of: ${
           Array.from(ADVANCED_OPTIONS.keys()).join(", ")
@@ -266,12 +266,13 @@ async function promptUser(
       );
     }
 
-    return ADVANCED_OPTIONS.get(option)!;
+    return ADVANCED_OPTIONS.get(o)!;
   });
 
-  const advancedOptions = cliOptions ?? await Checkbox.prompt({
+  const advancedOptions = cliOptions ?? await prompt<string[]>({
+    type: "multiselect",
     message: "Advanced options",
-    options: getAdvancedOptions(minecraftVersion),
+    choices: getAdvancedOptions(minecraftVersion),
   });
 
   return {
@@ -326,30 +327,53 @@ async function defaultOptions(
   };
 }
 
-function getAdvancedOptions(minecraftVersion: string): CheckboxOption<string>[] {
-  const options: CheckboxOption<string>[] = [];
+async function prompt<T>(
+  question: Omit<prompts.PromptObject<"value">, "name">,
+): Promise<T> {
+  const answers = await prompts({ ...question, name: "value" }, {
+    onCancel: () => fatalError("Project generation cancelled"),
+  });
 
-  options.push({ value: ICON_ADVANCED_OPTION, checked: true });
-  options.push({ value: KOTLIN_ADVANCED_OPTION });
-  
+  return answers.value;
+}
+
+function getAdvancedOptions(minecraftVersion: string): prompts.Choice[] {
+  const options: prompts.Choice[] = [];
+
+  options.push({
+    title: ICON_ADVANCED_OPTION,
+    value: ICON_ADVANCED_OPTION,
+    selected: true,
+  });
+  options.push({ title: KOTLIN_ADVANCED_OPTION, value: KOTLIN_ADVANCED_OPTION });
+
   if (!generator.minecraftIsUnobfuscated(minecraftVersion)) {
-    options.push({ value: MOJMAP_ADVANCED_OPTION, checked: true });
+    options.push({
+      title: MOJMAP_ADVANCED_OPTION,
+      value: MOJMAP_ADVANCED_OPTION,
+      selected: true,
+    });
   }
 
   if (generator.minecraftSupportsDataGen(minecraftVersion)) {
     options.push({
+      title: DATAGEN_ADVANCED_OPTION,
       value: DATAGEN_ADVANCED_OPTION,
     });
   }
 
   if (generator.minecraftSupportsSplitSources(minecraftVersion)) {
     options.push({
+      title: SPLIT_ADVANCED_OPTION,
       value: SPLIT_ADVANCED_OPTION,
-      checked: true,
+      selected: true,
     });
   }
 
-  options.push({ value: KOTLIN_DSL_ADVANCED_OPTION });
+  options.push({
+    title: KOTLIN_DSL_ADVANCED_OPTION,
+    value: KOTLIN_DSL_ADVANCED_OPTION,
+  });
 
   return options;
 }
