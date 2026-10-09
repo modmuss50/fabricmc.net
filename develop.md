@@ -53,5 +53,5 @@ If you require additional help, [the Fabric Discord server](https://discord.gg/v
 <div class="fabric-component" data-component="Versions"></div>
 
 {% assign cacheBust = site.time | date:'?v=%s' %}
-<script type="text/javascript" src="{{ "/scripts/main.js" | relative_url | append: cacheBust }}"></script>
+<script type="module" src="{{ "/scripts/main.js" | relative_url | append: cacheBust }}"></script>
 <link href="{{ "/scripts/style.css" | relative_url | append: cacheBust }}" rel="stylesheet">

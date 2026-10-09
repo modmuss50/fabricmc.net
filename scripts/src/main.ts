@@ -1,9 +1,7 @@
-interface Constructor {
-    new(options: any): unknown;
-}
+import { mount, type Component } from "svelte";
 
 interface Module {
-    default: Constructor;
+    default: Component;
 }
 
 function lazy(name: string): () => Promise<Module> {
@@ -46,7 +44,7 @@ function initComponents() {
         }
 
         constructorPromise().then((module) => {
-            new module.default({
+            mount(module.default, {
                 target
             });
         })

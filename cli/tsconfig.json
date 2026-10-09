@@ -7,7 +7,7 @@
     "noEmit": true,
     "strict": true,
     "skipLibCheck": true,
-    "types": ["node", "vite/client"]
+    "types": ["node"]
   },
-  "include": ["main.ts", "bundle.ts", "fontgen.ts", "test.ts", "commands/*.ts"]
+  "include": ["main.ts", "bundle.ts", "fontgen.ts", "test.ts", "commands/*.ts", "templates.d.ts"]
 }

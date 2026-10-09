@@ -71,7 +71,8 @@
             config,
             writer: {
                 write: async (path, content, options) => {
-                    zip.file(path, content, {
+                    const zipContent = typeof content === "string" ? content : new Uint8Array(content);
+                    zip.file(path, zipContent, {
                         unixPermissions: options?.executable ? "774": undefined
                     });
                 },

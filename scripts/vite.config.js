@@ -14,9 +14,10 @@ export default defineConfig(({ mode }) => ({
     // we do not have a real entrypoint
     lib: {
       entry: './src/main.ts',
+      cssFileName: 'style',
       formats: ["es"]
     },
-    rollupOptions: {
+    rolldownOptions: {
       output: {
         entryFileNames: `[name].js`,
         chunkFileNames: `[name].[hash].js`,
@@ -25,4 +26,3 @@ export default defineConfig(({ mode }) => ({
     }
   }
 }));
-
