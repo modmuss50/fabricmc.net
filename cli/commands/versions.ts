@@ -1,6 +1,5 @@
-// @deno-types="../../scripts/dist/fabric-template-generator.d.ts"
 import * as generator from "../../scripts/dist/fabric-template-generator.js";
-import { Command } from "jsr:@cliffy/command@1.2.1";
+import { Command } from "@cliffy/command";
 
 const LOOM_VERSION = "1.18-SNAPSHOT";
 

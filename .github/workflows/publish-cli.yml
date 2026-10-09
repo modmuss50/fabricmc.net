@@ -24,12 +24,9 @@ jobs:
           ref: ${{ github.event.workflow_run.head_sha }}
       - uses: actions/setup-node@v6
         with:
-          node-version: '24'
+          node-version-file: .nvmrc
           registry-url: https://registry.npmjs.org
           package-manager-cache: false
-      - uses: denoland/setup-deno@v2
-        with:
-          deno-version: '2.9.4'
       - run: npm install -g npm@11
       - name: Set CLI version
         working-directory: cli
@@ -37,6 +34,7 @@ jobs:
           BUILD_NUMBER: ${{ github.event.workflow_run.run_number }}
         run: npm version "0.1.${BUILD_NUMBER}" --no-git-tag-version
       - run: npm --prefix scripts ci
+      - run: npm --prefix cli ci
       - run: npm --prefix cli run build
       - name: Check CLI
         working-directory: cli

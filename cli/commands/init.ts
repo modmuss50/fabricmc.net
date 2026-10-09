@@ -1,23 +1,22 @@
-// @deno-types="../../scripts/dist/fabric-template-generator.d.ts"
 import * as generator from "../../scripts/dist/fabric-template-generator.js";
-import { Command } from "jsr:@cliffy/command@1.2.1";
+import { Command } from "@cliffy/command";
 import {
   Checkbox,
   type CheckboxOption,
   Input,
   Select,
-} from "jsr:@cliffy/prompt@1.2.1";
-import { XMLParser } from "npm:fast-xml-parser@5.11.1";
+} from "@cliffy/prompt";
+import { XMLParser } from "fast-xml-parser";
 import * as path from "node:path";
 import { mkdir, writeFile as write } from "node:fs/promises";
 import { cwd, env, exit } from "node:process";
-import { colors } from "jsr:@cliffy/ansi@1.2.1/colors";
+import { colors } from "@cliffy/ansi/colors";
 import * as utils from "../utils.ts";
 import fontData from "../font.ts";
-import { decodeBase64 } from "https://deno.land/std@0.203.0/encoding/base64.ts";
-import * as png from "https://deno.land/x/pngs@0.1.1/mod.ts";
-import * as pureimage from "https://esm.sh/pureimage@0.4.13";
-import * as opentype from "https://esm.sh/opentype.js@0.4.11";
+import { Buffer } from "node:buffer";
+import { PNG } from "pngjs";
+import * as pureimage from "pureimage";
+import * as opentype from "opentype.js";
 
 const error = colors.bold.red;
 const progress = colors.bold.yellow;
@@ -94,7 +93,8 @@ generator.setXmlVersionParser((xml) => {
 });
 
 const fontLoader = pureimage.registerFont("", generator.ICON_FONT);
-fontLoader.font = opentype.parse(decodeBase64(fontData).buffer);
+const fontBytes = Uint8Array.from(Buffer.from(fontData, "base64"));
+fontLoader.font = opentype.parse(fontBytes.buffer);
 fontLoader.loaded = true;
 
 export function getGeneratorOptions(
@@ -114,7 +114,11 @@ export function getGeneratorOptions(
 
         return {
           getContext: (id) => bitmap.getContext(id),
-          getPng: () => png.encode(bitmap.data, bitmap.width, bitmap.height).buffer,
+          getPng: () => {
+            const png = new PNG({ width: bitmap.width, height: bitmap.height });
+            png.data = Buffer.from(bitmap.data);
+            return Uint8Array.from(PNG.sync.write(png)).buffer;
+          },
           measureText(ctx: pureimage.Context, text) {
             const font = fontLoader.font;
             const fontSize = ctx._font.size!;
@@ -170,11 +174,9 @@ async function getAndPrepareOutputDir(
   outputDirName: string | undefined,
 ): Promise<string> {
   if (outputDirName == undefined) {
-    await requestPermissions(".");
     return path.resolve(cwd());
   }
 
-  await requestPermissions(outputDirName);
   const outputDir = path.resolve(outputDirName!);
 
   await mkdir(outputDir, { recursive: true });
@@ -365,41 +367,6 @@ async function writeFile(
     typeof content === "string" ? content : new Uint8Array(content),
     { mode: options?.executable ? 0o744 : undefined },
   );
-}
-
-async function requestPermissions(outputDir: string) {
-  if (typeof Deno === "undefined") return;
-
-  const permissions: Deno.PermissionDescriptor[] = [
-    {
-      name: "read",
-      path: cwd(), // We need this for all operations, path.resolve requries it.
-    },
-    {
-      name: "read",
-      path: outputDir,
-    },
-    {
-      name: "write",
-      path: outputDir,
-    },
-    {
-      name: "net",
-      host: "meta.fabricmc.net",
-    },
-    {
-      name: "net",
-      host: "maven.fabricmc.net",
-    },
-  ];
-
-  for (const permission of permissions) {
-    const status = await Deno.permissions.request(permission);
-
-    if (status.state != "granted") {
-      fatalError("Permission not granted");
-    }
-  }
 }
 
 function fatalError(message: string) {

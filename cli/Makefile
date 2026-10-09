@@ -1,37 +1,28 @@
-ENTRYPOINT=main.ts
-DENO_PERMISSIONS=--allow-net --allow-env --allow-read --allow-write
-
-run: fontgen
-	cd ../scripts; \
-		npm install; \
-		npm run buildLib
-	deno run $(DENO_PERMISSIONS) $(ENTRYPOINT)
+run: build
+	node bundled.mjs
 
 check:
-	deno check $(ENTRYPOINT)
+	npm run check
 
 fontgen:
-	deno run --allow-read --allow-write fontgen.ts
+	node fontgen.ts
 
 test: fontgen check
-	deno test --allow-env --allow-read --allow-net --allow-write --allow-run test.ts
+	npm test
 
 build: fontgen check
-	deno run --allow-env --allow-read --allow-net --allow-write --allow-run bundle.ts
+	node bundle.ts
 
 install: build
-	deno install $(DENO_PERMISSIONS) -f -n fabric bundled.ts
+	npm install -g .
 
-install-bundled: build
-	deno install $(DENO_PERMISSIONS) -f -n fabric bundled.ts
+install-bundled: install
 
-init:
+init: build
 	rm -rf ./test
-	deno run $(DENO_PERMISSIONS) $(ENTRYPOINT) init ./test
+	node bundled.mjs init ./test
 
-versions:
-	deno run $(DENO_PERMISSIONS) $(ENTRYPOINT) versions
+versions: build
+	node bundled.mjs versions
 
-init-bundled: build
-	rm -rf ./test
-	deno run $(DENO_PERMISSIONS) bundled.ts init ./test
+init-bundled: init

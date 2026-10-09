@@ -14,13 +14,10 @@ jobs:
           path: _site
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version-file: .nvmrc
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '2.7.4'
-      - uses: denoland/setup-deno@v2
-        with:
-          deno-version: "2.9.4"
       # Jekyll 4 fails to create the .jekyll-cache directory, but if we pre-create it, it works
       - run: mkdir -p .jekyll-cache
       - run: bundler install --deployment && bundler exec jekyll build
@@ -32,9 +29,11 @@ jobs:
         working-directory: ./scripts
       - run: npm run buildLib
         working-directory: ./scripts
+      - run: npm ci
+        working-directory: ./cli
       - run: make build
         working-directory: ./cli
-      - run: rm -rf ./_site/cli && cp ./cli/bundled.ts ./_site/cli
+      - run: rm -rf ./_site/cli
       # Upload the static content as a workflow artifact when not publishing the site (non-main branches)
       - name: Archive site
         uses: actions/upload-artifact@v4

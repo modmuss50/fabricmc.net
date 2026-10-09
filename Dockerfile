@@ -1,4 +1,4 @@
-FROM node:18-bookworm
+FROM node:26.11.1-bookworm
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -11,10 +11,6 @@ ENV PATH="${PATH}:$HOME/gems/bin"
 ENV GEM_HOME="$HOME/gems"
 RUN gem install jekyll bundler
 
-ENV DENO_INSTALL="$HOME/.deno"
-ENV DENO_INSTALL_ROOT="$HOME/.deno"
-RUN curl -fsSL https://deno.land/x/install/install.sh | sh -s v2.9.4
-ENV PATH="${PATH}:$HOME/.deno/bin"
 
 ENV JAVA_HOME=/opt/java/openjdk
 COPY --from=eclipse-temurin:21 $JAVA_HOME $JAVA_HOME

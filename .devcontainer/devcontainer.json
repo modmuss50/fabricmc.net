@@ -9,8 +9,7 @@
 		"vscode": {
 			"extensions": [
 				"svelte.svelte-vscode",
-				"shadowtime2000.eta-vscode",
-				"denoland.vscode-deno"
+				"shadowtime2000.eta-vscode"
 			]
 		}
 	}
