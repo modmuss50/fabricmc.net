@@ -4,7 +4,6 @@
 !/.vscode
 !main.ts
 !/commands
-!Makefile
 !bundle.ts
 !fontgen.ts
 !test.ts
@@ -12,6 +11,4 @@
 !package.json
 !README.md
 !LICENSE
-!package-lock.json
-!.npmrc
 !tsconfig.json

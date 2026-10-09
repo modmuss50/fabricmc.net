@@ -1,0 +1,15 @@
+{
+  "name": "fabricmc-net",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "scripts",
+    "cli"
+  ],
+  "scripts": {
+    "cli": "npm start --workspace cli --",
+    "dev": "npm run dev --workspace scripts",
+    "build": "npm run build --workspace scripts && npm run build --workspace cli",
+    "check": "npm run check --workspaces"
+  }
+}

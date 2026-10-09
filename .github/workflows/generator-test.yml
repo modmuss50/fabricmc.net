@@ -9,11 +9,9 @@ jobs:
       - uses: devcontainers/ci@v0.3
         with:
           runCmd: |
-            npm --prefix scripts ci
-            npm --prefix cli ci
-            npm --prefix cli run build
-            cd cli
-            make test
+            npm ci
+            npm run build --workspace cli
+            npm test --workspace cli
       - uses: actions/upload-artifact@v4
         with:
           path: 

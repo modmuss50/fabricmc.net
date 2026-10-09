@@ -28,14 +28,13 @@ jobs:
           registry-url: https://registry.npmjs.org
           package-manager-cache: false
       - run: npm install -g npm@11
+      - run: npm ci
       - name: Set CLI version
         working-directory: cli
         env:
           BUILD_NUMBER: ${{ github.event.workflow_run.run_number }}
         run: npm version "0.1.${BUILD_NUMBER}" --no-git-tag-version
-      - run: npm --prefix scripts ci
-      - run: npm --prefix cli ci
-      - run: npm --prefix cli run build
+      - run: npm run build --workspace cli
       - name: Check CLI
         working-directory: cli
         run: |

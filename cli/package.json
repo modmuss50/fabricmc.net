@@ -2,10 +2,12 @@
   "name": "@fabricmc/cli",
   "type": "module",
   "scripts": {
-    "build": "npm --prefix ../scripts run buildLib && make build",
+    "build": "npm run fontgen && npm run check && node bundle.ts",
+    "prestart": "npm run build",
     "start": "node bundled.mjs",
     "check": "tsc --noEmit",
-    "test": "node --test test.ts"
+    "test": "npm run fontgen && npm run check && node bundle.ts test && node --test test-bundled.mjs",
+    "fontgen": "node fontgen.ts"
   },
   "engines": {
     "node": ">=22"
@@ -43,6 +45,7 @@
     "pngjs": "7.0.0",
     "pureimage": "0.4.13",
     "typescript": "^5.1.3",
-    "wawoff2": "2.0.1"
+    "wawoff2": "2.0.1",
+    "@fabricmc/scripts": "0.0.0"
   }
 }

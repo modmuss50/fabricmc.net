@@ -3,7 +3,7 @@ import {
   getTemplateGameVersions,
   minecraftSupportsSplitSources,
   minecraftIsUnobfuscated,
-} from "../scripts/dist/fabric-template-generator.js";
+} from "@fabricmc/scripts";
 import { getGeneratorOptions } from "./commands/init.ts";
 import assert from "node:assert/strict";
 import { test } from "node:test";

@@ -1,6 +1,6 @@
 _site/
 
-javascript/node_modules/
+node_modules/
 javascript/public/build/
 
 .idea

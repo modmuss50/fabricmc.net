@@ -18,17 +18,9 @@ jobs:
         with:
           node-version-file: .nvmrc
       - name: Install NPM dependencies
-        run: npm i
-        working-directory: scripts
-      - name: Build template library
-        run: npm run buildLib
-        working-directory: scripts
-      - name: Install CLI dependencies
         run: npm ci
-        working-directory: cli
       - name: Build Fabric CLI
-        run: make build
-        working-directory: cli
+        run: npm run build --workspace cli
       - name: Upload Fabric CLI
         uses: actions/upload-artifact@v7
         with:

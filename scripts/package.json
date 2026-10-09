@@ -1,11 +1,10 @@
 {
-  "name": "typescript",
+  "name": "@fabricmc/scripts",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite build --watch -m development",
     "build": "npm run check && vite build",
-    "buildLib": "BUILD_LIB=true vite build",
     "check": "svelte-check --tsconfig ./tsconfig.json"
   },
   "devDependencies": {
@@ -22,7 +21,11 @@
   "dependencies": {
     "eta": "^3.0.3",
     "file-saver": "^2.0.5",
-    "jszip": "^3.10.1",
-    "vite-plugin-dts": "^2.3.0"
+    "jszip": "^3.10.1"
+  },
+  "private": true,
+  "exports": {
+    ".": "./src/lib.ts",
+    "./versions": "./src/lib/template/versions.ts"
   }
 }

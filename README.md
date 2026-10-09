@@ -14,7 +14,7 @@ Install Docker and VSCode on the host, no need to install NodeJS or Ruby on the 
 
 * Open dev container with vscode
 * Run `bundle install && bundler exec jekyll serve` in a terminal
-* In a second terminal, run: `cd scripts`, `npm i`, `npm run dev`
+* In a second terminal, run: `npm ci`, `npm run dev`
 * http://localhost:4000/
 
 ## Build
@@ -36,9 +36,22 @@ From then on, run Jekyll using `bundle exec jekyll <args>` to use the local vers
 
 ### Build JavaScript Assets
 
-Install the JavaScript dependencies by running `npm install` in the `javascript` subdirectory.
+Install dependencies for the `scripts` and `cli` workspaces by running `npm ci` in the repository root.
 
-Then build the JavaScript bundle using `npm run build`.
+Build the website assets with `npm run build --workspace scripts`, or build both workspaces with `npm run build`.
+
+Build the CLI separately with `npm run build --workspace cli`.
+
+### Running the CLI from Source
+
+Run CLI commands from the repository root:
+
+```sh
+npm run cli -- init
+npm run cli -- versions
+```
+
+Each invocation builds and type-checks the CLI before running it. Use the Node version in `.nvmrc` (`nvm install` and `nvm use` if using nvm).
 
 ### Build Site
 

@@ -1,4 +1,4 @@
-import * as generator from "../../scripts/dist/fabric-template-generator.js";
+import * as generator from "@fabricmc/scripts";
 import { Command } from "@cliffy/command";
 import {
   Checkbox,
