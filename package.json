@@ -8,8 +8,18 @@
   ],
   "scripts": {
     "cli": "npm start --workspace cli --",
-    "dev": "npm run dev --workspace scripts",
-    "build": "npm run build --workspace scripts && npm run build --workspace cli",
-    "check": "npm run check --workspaces"
+    "dev": "eleventy --serve",
+    "build": "npm run build:site && npm run build --workspace cli",
+    "check": "npm run check --workspaces",
+    "build:site": "npm run check --workspace scripts && eleventy"
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "^3.1.6",
+    "markdown-it": "^15.0.2",
+    "markdown-it-anchor": "^10.0.0",
+    "prismjs": "^1.30.0",
+    "sass": "^1.105.1",
+    "vite": "^8.3.4",
+    "yaml": "^2.9.1"
   }
 }

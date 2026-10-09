@@ -7,22 +7,16 @@ export default defineConfig(({ mode }) => ({
   plugins: [svelte()],
   build: {
     sourcemap: mode === "development",
-    // Build directly into the Jekyll output directory
+    // Build directly into the Eleventy output directory
     outDir: "../_site/scripts/",
     emptyOutDir: true,
-    // Since we use the generated Svelte components in the Jekyll page,
+    // Since we use the generated Svelte components in the Eleventy page,
     // we do not have a real entrypoint
     lib: {
       entry: './src/main.ts',
+      fileName: 'main',
       cssFileName: 'style',
       formats: ["es"]
-    },
-    rolldownOptions: {
-      output: {
-        entryFileNames: `[name].js`,
-        chunkFileNames: `[name].[hash].js`,
-        assetFileNames: `[name].[ext]`
-      }
     }
   }
 }));

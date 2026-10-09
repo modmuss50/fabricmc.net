@@ -7,27 +7,11 @@ jobs:
       ImageOS: ubuntu22
     steps:
       - uses: actions/checkout@v2
-      # Maintain timestamps of previously published files
-      - uses: actions/checkout@v2
-        with:
-          ref: static
-          path: _site
       - uses: actions/setup-node@v3
         with:
           node-version-file: .nvmrc
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '2.7.4'
-      # Jekyll 4 fails to create the .jekyll-cache directory, but if we pre-create it, it works
-      - run: mkdir -p .jekyll-cache
-      - run: bundler install --deployment && bundler exec jekyll build
       - run: npm ci
-      - run: npm run check
-        working-directory: ./scripts
       - run: npm run build
-        working-directory: ./scripts
-      - run: npm run build --workspace cli
-      - run: rm -rf ./_site/cli
       # Upload the static content as a workflow artifact when not publishing the site (non-main branches)
       - name: Archive site
         uses: actions/upload-artifact@v4
@@ -36,7 +20,6 @@ jobs:
           path: _site
           retention-days: 2
 
-  # Separate job so it doesn't run inside the jekyll container
   publish:
     needs: build
     runs-on: ubuntu-22.04

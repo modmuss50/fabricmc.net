@@ -12,9 +12,7 @@ Please submit any suggestions or feedback to <a href="https://github.com/FabricM
 <noscript style="color:red">You need Javascript to generate a mod template</noscript>
 <div class="fabric-component" data-component="Template"></div>
 
-{% assign cacheBust = site.time | date:'?v=%s' %}
-<script type="module" src="{{ "/scripts/main.js" | relative_url | append: cacheBust }}"></script>
-<link href="{{ "/scripts/style.css" | relative_url | append: cacheBust }}" rel="stylesheet">
+{% include 'scripts.html' %}
 
 <br>
 For setup instructions please see the [fabric docs](https://docs.fabricmc.net/develop/) that relates to the IDE that you are using.

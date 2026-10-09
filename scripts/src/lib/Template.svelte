@@ -2,7 +2,7 @@
     import JSZip from "jszip";
     import FileSaver from "file-saver";
     import DownloadIcon from "./DownloadIcon.svelte";
-    import { ICON_FONT, getTemplateGameVersions, type Configuration } from "./template/template";
+    import { ICON_FONT, generateTemplate, getTemplateGameVersions, type Configuration } from "./template/template";
     import { minecraftSupportsDataGen, minecraftSupportsSplitSources, computeCustomModIdErrors, sharedModIdChecks, nameToModId, minecraftIsUnobfuscated} from "./template/minecraft";
     import { computePackageNameErrors, formatPackageName } from "./template/java"
     import { decode64 } from "./template/utils";
@@ -51,7 +51,6 @@
 
         loading = true;
 
-        const generator = await import("./template/template");
         const config: Configuration = {
             modid: customModId ?? modid,
             minecraftVersion,
@@ -67,7 +66,7 @@
 
         const zip = new JSZip();
 
-        await generator.generateTemplate({
+        await generateTemplate({
             config,
             writer: {
                 write: async (path, content, options) => {

@@ -1,0 +1,3 @@
+{% assign cacheBust = buildTime | date: "?v=%s" %}
+<script type="module" src="{{ "/scripts/main.js" | append: cacheBust }}"></script>
+<link href="{{ "/scripts/style.css" | append: cacheBust }}" rel="stylesheet">

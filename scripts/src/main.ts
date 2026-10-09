@@ -51,6 +51,10 @@ function initComponents() {
     }
 }
 
-document.addEventListener("DOMContentLoaded", initComponents);
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initComponents);
+} else {
+    initComponents();
+}
 
 export {}
