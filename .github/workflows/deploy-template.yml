@@ -3,26 +3,23 @@ on:
   workflow_dispatch:
   schedule:
     - cron: 37 7 * * SAT
+permissions:
+  contents: read
 
 jobs:
   build:
     name: Build Fabric CLI
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     outputs:
       versions: ${{ steps.versions-lookup.outputs.result }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v6
-      - name: Setup NodeJS
-        uses: actions/setup-node@v6
-        with:
-          node-version-file: .nvmrc
-      - name: Install NPM dependencies
-        run: npm ci
+        uses: actions/checkout@v7.0.1
+      - uses: ./.github/actions/setup
       - name: Build Fabric CLI
         run: npm run build --workspace cli
       - name: Upload Fabric CLI
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: cli
           path: cli/bundled.mjs
@@ -31,7 +28,7 @@ jobs:
         id: versions-lookup
   deploy:
     name: Deploy ${{ matrix.version }} template
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: build
     concurrency:
       group: deploy-${{ matrix.version }}
@@ -39,22 +36,22 @@ jobs:
       matrix:
         version: ${{ fromJSON(needs.build.outputs.versions) }}
     steps:
-      - name: Checkout Node version
-        uses: actions/checkout@v6
+      - name: Checkout CI setup
+        uses: actions/checkout@v7.0.1
         with:
-          sparse-checkout: .nvmrc
+          sparse-checkout: |
+            .nvmrc
+            .github/actions/setup
           sparse-checkout-cone-mode: false
-      - name: Setup NodeJS
-        uses: actions/setup-node@v6
+      - uses: ./.github/actions/setup
         with:
-          node-version-file: .nvmrc
+          install-dependencies: 'false'
       - name: Download Fabric CLI
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@v8.0.1
         with:
           name: cli
       - name: Checkout template repository
-        uses: actions/checkout@v6
-        id: existing-checkout
+        uses: actions/checkout@v7.0.1
         with:
           repository: ${{ github.repository_owner }}/fabric-example-mod
           path: repo
