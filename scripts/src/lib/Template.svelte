@@ -291,7 +291,7 @@
 <style lang="scss">
     @font-face {
     	font-family: "Comic Relief";
-	    src: url("/assets/fonts/ComicRelief-Regular.woff2");
+	    src: url("../../../assets/fonts/ComicRelief-Regular.woff2?no-inline");
     }
     
     .template {

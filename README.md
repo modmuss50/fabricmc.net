@@ -23,6 +23,18 @@ npm run dev
 
 Open http://localhost:4000/.
 
+### Preview the build
+
+Build the website and serve the generated files without live reloading:
+
+```sh
+npm run build:site
+npm run preview
+```
+
+Open http://localhost:4173/. Preview serves the existing `_site` directory;
+run the build again to include further changes.
+
 ### Running the CLI
 
 Run CLI commands from the repository root:

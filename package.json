@@ -9,6 +9,7 @@
   "scripts": {
     "cli": "npm start --workspace cli --",
     "dev": "eleventy --serve",
+    "preview": "vite preview --outDir _site",
     "build": "npm run build:site && npm run build --workspace cli",
     "check": "npm run check --workspaces",
     "build:site": "npm run check --workspace scripts && eleventy"

@@ -3,6 +3,7 @@ import { svelte } from '@sveltejs/vite-plugin-svelte'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  base: '/scripts/',
   // Web build
   plugins: [svelte()],
   build: {
@@ -10,6 +11,7 @@ export default defineConfig(({ mode }) => ({
     // Build directly into the Eleventy output directory
     outDir: "../_site/scripts/",
     emptyOutDir: true,
+    manifest: true,
     // Since we use the generated Svelte components in the Eleventy page,
     // we do not have a real entrypoint
     lib: {
@@ -17,6 +19,12 @@ export default defineConfig(({ mode }) => ({
       fileName: 'main',
       cssFileName: 'style',
       formats: ["es"]
+    },
+    rolldownOptions: {
+      output: {
+        entryFileNames: '[name]-[hash].js',
+        assetFileNames: '[name]-[hash][extname]'
+      }
     }
   }
 }));

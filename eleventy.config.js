@@ -1,4 +1,5 @@
-import { rmSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { compile } from "sass";
 import { build } from "vite";
 import MarkdownIt from "markdown-it";
@@ -24,7 +25,14 @@ const markdown = new MarkdownIt({
 
 export default function (config) {
     const development = process.env.ELEVENTY_RUN_MODE !== "build";
-    config.addGlobalData("buildTime", () => new Date());
+    const assetUrls = new Map();
+    config.addFilter("asset_url", url => {
+        const assetUrl = assetUrls.get(url);
+        if (!assetUrl) {
+            throw new Error(`Unknown asset: ${url}`);
+        }
+        return assetUrl;
+    });
     config.addDataExtension("yml", contents => parse(contents));
     config.setLibrary("md", markdown);
     config.addFilter("json", value => JSON.stringify(value).replace(/</g, "\\u003c"));
@@ -44,26 +52,30 @@ export default function (config) {
     config.addPassthroughCopy("download");
     config.addPassthroughCopy("robots.txt");
     config.ignores.add("{README.md,LICENSE,scripts/**,cli/**,node_modules/**}");
-    config.on("eleventy.before", () => {
+    config.on("eleventy.before", async () => {
         if (!development) {
             rmSync("_site", { recursive: true, force: true });
         }
-    });
-    config.on("eleventy.after", async () => {
+        mkdirSync("_site/assets", { recursive: true });
         for (const name of ["main", "dark"]) {
             const result = compile(`assets/${name}.scss`, {
                 loadPaths: ["_sass"],
                 style: "compressed",
                 silenceDeprecations: ["import", "global-builtin", "color-functions", "slash-div"],
             });
-            // Sass is generated separately so the legacy public CSS URLs stay stable.
-            writeFileSync(`_site/assets/${name}.css`, result.css);
+            const hash = createHash("sha256").update(result.css).digest("hex").slice(0, 12);
+            const url = `/assets/${name}-${hash}.css`;
+            writeFileSync(`_site${url}`, result.css);
+            assetUrls.set(`/assets/${name}.css`, url);
         }
         await build({
             root: "scripts",
             configFile: "scripts/vite.config.js",
             mode: development ? "development" : "production",
         });
+        const manifest = JSON.parse(readFileSync("_site/scripts/.vite/manifest.json", "utf8"));
+        assetUrls.set("/scripts/main.js", `/scripts/${manifest["src/main.ts"].file}`);
+        assetUrls.set("/scripts/style.css", `/scripts/${manifest["style.css"].file}`);
     });
     return {
         templateFormats: ["md", "html", "liquid"],
