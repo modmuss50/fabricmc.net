@@ -53,13 +53,13 @@ From a modder's pespective it's a lot more complicated and best answered by look
 
 To quote [the Reddit post by scratchisthebest](https://old.reddit.com/r/feedthebeast/comments/a4q3rt/announcing_fabric_a_new_minecraft_114_modding/ebgw5xa/):
 
-> [...] what there is of the Fabric ecosystem is shaping up to smell a little like NPM? Do you see that screenshot of the mod list in the blog post? That... is its own mod ;)
+> […] what there is of the Fabric ecosystem is shaping up to smell a little like NPM? Do you see that screenshot of the mod list in the blog post? That... is its own mod ;)
 > 
-> This is reflected in Fabric's design as well. Fabric itself is basically the smallest possible thing that can be called a mod loader without lying. It discovers mods, [...] [adds] a rudimentary dependencies sysyem, and it lets you hack the game to bits with Mixin. That's about it.
+> This is reflected in Fabric's design as well. Fabric itself is basically the smallest possible thing that can be called a mod loader without lying. It discovers mods, […] \[adds\] a rudimentary dependencies sysyem, and it lets you hack the game to bits with Mixin. That's about it.
 > 
-> Fabric API, though, is a small [...] collection of things people find convenient when modding. But it's just a collection of useful methods and hooks.
+> Fabric API, though, is a small […] collection of things people find convenient when modding. But it's just a collection of useful methods and hooks.
 > 
-> If you installed only Fabric and Fabric API on your game, you wouldn't think a single thing is different. [..]
+> If you installed only Fabric and Fabric API on your game, you wouldn't think a single thing is different. […]
 > 
 > Authors are encouraged to create small and reusable components. Expect less "MyNameLib" which has 50 features spanning all throughout the game, and more specific components that lots of modders can use together.
 

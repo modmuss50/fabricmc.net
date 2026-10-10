@@ -1,0 +1,7 @@
+@use "sass:meta";
+
+@include meta.load-css("main");
+
+@media (prefers-color-scheme: dark) {
+    @include meta.load-css("dark");
+}

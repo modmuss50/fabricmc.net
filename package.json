@@ -8,19 +8,30 @@
   ],
   "scripts": {
     "cli": "npm start --workspace cli --",
-    "dev": "eleventy --serve",
-    "preview": "vite preview --outDir _site",
+    "dev": "vite --port 4000",
+    "preview": "vite preview --port 4173",
     "build": "npm run build:site && npm run build --workspace cli",
-    "check": "npm run check --workspaces",
-    "build:site": "npm run check --workspace scripts && eleventy"
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json && npm run check --workspaces",
+    "build:site": "npm run check && vite build && node --test tooling/site.test.ts"
   },
   "devDependencies": {
-    "@11ty/eleventy": "^3.1.6",
-    "markdown-it": "^15.0.2",
-    "markdown-it-anchor": "^10.0.0",
+    "@sveltejs/adapter-static": "^4.0.0",
+    "@sveltejs/kit": "^3.0.1",
+    "@sveltejs/vite-plugin-svelte": "^7.3.1",
+    "@types/hast": "^3.0.5",
+    "@types/node": "^26.6.5",
+    "@types/prismjs": "^1.26.6",
+    "entities": "^8.1.0",
+    "mdsvex": "^0.12.8",
     "prismjs": "^1.30.0",
     "sass": "^1.105.1",
-    "vite": "^8.3.4",
-    "yaml": "^2.9.1"
+    "svelte": "^5.57.2",
+    "svelte-check": "^4.7.6",
+    "typescript": "^6.0.3",
+    "vite": "^8.3.4"
+  },
+  "imports": {
+    "#tools/*": "./scripts/src/lib/*",
+    "#lib/*": "./src/lib/*"
   }
 }

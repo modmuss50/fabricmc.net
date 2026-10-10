@@ -60,7 +60,7 @@ rapidly rising versions of mods with changes enforced by Minecraft or other APIs
 or finding hacky solutions to avoid class loading or interface application. While we have a good vision on how to implement this, it requires a good versioning system!
 * Configuration. In this regard, after very long, opinionated and painful discussions, we have settled on using TOML as the primary format. There are two issues to solve: (a) actually writing the code, and (b) deciding
 how much of it goes into Loader. It is likely that the whole configuration API will go into Loader, being independent from anything but mod/file loading - this includes an intermediate "node" representation,
-constraint validation, loading/saving, etc. - whereas extensions to it, such as server<->client synchronization or game-dependent constriants, will go into the API. This is because even mods which don't rely on API
+constraint validation, loading/saving, etc. - whereas extensions to it, such as server&lt;-&gt;client synchronization or game-dependent constriants, will go into the API. This is because even mods which don't rely on API
 are very likely to benefit from a config format. Another option is to make a separate module for configuration that's distributed with API by default but separable, however toml4j would be easier to distribute with
 Loader.
 

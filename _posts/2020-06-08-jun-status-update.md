@@ -133,7 +133,7 @@ Some of the modules originally developed targeting 1.16 have already been backpo
 
 #### Multiplayer
 
-Earthcomputer worked on a fun [pull request to add multiplayer support](https://github.com/FabricMC/Enigma/pull/221), or as he puts it, "~~battle royale~~ real-time collab support".
+Earthcomputer worked on a fun [pull request to add multiplayer support](https://github.com/FabricMC/Enigma/pull/221), or as he puts it, “~~battle royale~~ real-time collab support”.
 
 To access this feature, open a jar in Enigma, and click the *Collab* option at the top of the screen:
 

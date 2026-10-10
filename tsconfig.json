@@ -1,0 +1,18 @@
+{
+  "extends": "$app/tsconfig",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false,
+    "strict": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": true
+  },
+  "include": [
+    "src",
+    "content",
+    "_posts",
+    "tooling",
+    "vite.config.ts"
+  ]
+}
